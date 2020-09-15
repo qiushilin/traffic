@@ -1,9 +1,7 @@
 """
+Project Name: Traffic
+
 @author: Hayk Stepanyan
-
-First Draft
-
-Last edited on September 14, 2020
 """
 
 import cv2
@@ -23,9 +21,9 @@ TEST_SIZE = 0.4
 
 def main():
 
-    # # Check command-line arguments
-    # if len(sys.argv) not in [2, 3]:
-    #     sys.exit("Usage: python traffic.py data_directory [model.h5]")
+    # Check command-line arguments
+    if len(sys.argv) not in [2, 3]:
+        sys.exit("Usage: python traffic.py data_directory [model.h5]")
 
     # Get image arrays and labels for all image files
     images, labels = load_data("gtsrb")
@@ -66,12 +64,11 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    images = []
-    labels = []
+    images, labels = [], []
     for category in range(43):
-        images_list = os.listdir(os.path.join("gtsrb", str(category)))
+        images_list = os.listdir(os.path.join(data_dir, str(category)))
         for image_name in images_list:
-            image = cv2.imread(os.path.join("gtsrb", str(category), str(image_name)))
+            image = cv2.imread(os.path.join(data_dir, str(category), str(image_name)))
             images.append(cv2.resize(image, (30, 30)))
             labels.append(category)
     return images, labels
@@ -86,29 +83,28 @@ def get_model():
     # Create a convolutional neural network
     model = tf.keras.models.Sequential([
 
-        # Convolutional layer. Learn 32 filters using a 3x3 kernel
+        # Convolutional layer. Learn 32 filters using a 4x4 kernel
         tf.keras.layers.Conv2D(
-            32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
+            32, (4, 4), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
         ),
 
-        # Max-pooling layer, using 4x4 pool size
-        tf.keras.layers.MaxPooling2D(pool_size=(4, 4)),
+        # Convolutional layer. Learn 64 filters using a 4x4 kernel
+        tf.keras.layers.Conv2D(
+            64, (4, 4), activation="relu"
+        ),
 
-        # Second convolutional layer.
-        tf.keras.layers.Conv2D(32, (3, 3), activation="relu"),
+        # Max Pooling
+        tf.keras.layers.MaxPooling2D(2, 2),
 
         # Flatten units
         tf.keras.layers.Flatten(),
 
         # Add a hidden layer with dropout
-        tf.keras.layers.Dense(NUM_CATEGORIES * 32, activation="relu"),
+        tf.keras.layers.Dense(256, activation="relu"),
+
+        # Add a hidden layer with dropout
+        tf.keras.layers.Dense(128, activation="relu"),
         tf.keras.layers.Dropout(0.3),
-
-        # Add a hidden layer
-        tf.keras.layers.Dense(NUM_CATEGORIES * 16, activation="relu"),
-
-        # Add a hidden layer
-        tf.keras.layers.Dense(NUM_CATEGORIES * 16, activation="relu"),
 
         # Add an output layer with output units for all 43 categories
         tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")

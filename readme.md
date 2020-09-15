@@ -2,6 +2,6 @@
 43 different categories <br/>
 <br/>
 
-10 epochs each takes approximately 15 seconds to calculate.
+10 epochs.
 <br/>
-Accuracy: 92.50 %
+Accuracy: 97.3%
