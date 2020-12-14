@@ -32,7 +32,7 @@ def load_data(data_dir):
             labels.append(category)
     return images, labels
 
-def get_model():
+def load_model():
     """
     Return:
         Trained CNN
@@ -88,7 +88,7 @@ x_train, x_test, y_train, y_test = train_test_split(
 )
 
 
-model = get_model()
+model = load_model()
 model.fit(x_train, y_train, epochs=EPOCHS)
 model.evaluate(x_test,  y_test, verbose=2)
 
@@ -96,4 +96,4 @@ model.evaluate(x_test,  y_test, verbose=2)
 if len(sys.argv) == 3:
     filename = sys.argv[2]
     model.save(filename)
-    print(f"Model saved to {filename}.")
+    print("Model saved to {}".format(filename))
